@@ -1,3 +1,13 @@
+<!-- default file list -->
+*Files to look at*:
+
+* [Car.cs](./CS/Car.cs) (VB: [CarScheduling.vb](./VB/CarScheduling.vb))
+* [CarScheduling.cs](./CS/CarScheduling.cs) (VB: [CarScheduling.vb](./VB/CarScheduling.vb))
+* [Form1.cs](./CS/Form1.cs) (VB: [Form1.vb](./VB/Form1.vb))
+* [Model1.Context.cs](./CS/Model1.Context.cs) (VB: [Model1.Context.vb](./VB/Model1.Context.vb))
+* [Model1.cs](./CS/Model1.cs) (VB: [Model1.vb](./VB/Model1.vb))
+* [Program.cs](./CS/Program.cs) (VB: [Program.vb](./VB/Program.vb))
+<!-- default file list end -->
 # How to handle the FetchAppointments event when the scheduler is used with Entity Framework
 
 
