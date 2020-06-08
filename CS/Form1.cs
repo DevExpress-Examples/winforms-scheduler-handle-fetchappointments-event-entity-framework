@@ -35,7 +35,7 @@ namespace SchedulerEntityFramework {
 
             var entities = carsXtraSchedulingEntities.CarSchedulings.Where(entity => (entity.EventType == 1) ||
                 (entity.EventType != 1 &&
-                (entity.OriginalStartTime >= startTime && entity.OriginalStartTime < endTime) || (entity.OriginalEndTime >= startTime && entity.OriginalEndTime < endTime)));
+                (entity.OriginalStartTime >= startTime && entity.OriginalStartTime < endTime) || (entity.OriginalEndTime > startTime && entity.OriginalEndTime <= endTime)));
             
             entities.Load();
             var collection =  carsXtraSchedulingEntities.CarSchedulings.Local.ToBindingList();
