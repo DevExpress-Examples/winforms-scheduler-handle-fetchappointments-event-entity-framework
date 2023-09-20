@@ -3,26 +3,48 @@
 [![](https://img.shields.io/badge/Open_in_DevExpress_Support_Center-FF7200?style=flat-square&logo=DevExpress&logoColor=white)](https://supportcenter.devexpress.com/ticket/details/E4668)
 [![](https://img.shields.io/badge/📖_How_to_use_DevExpress_Examples-e9f6fc?style=flat-square)](https://docs.devexpress.com/GeneralInformation/403183)
 <!-- default badges end -->
-<!-- default file list -->
-*Files to look at*:
 
-* [Car.cs](./CS/Car.cs) (VB: [CarScheduling.vb](./VB/CarScheduling.vb))
-* [CarScheduling.cs](./CS/CarScheduling.cs) (VB: [CarScheduling.vb](./VB/CarScheduling.vb))
+# WinForms Scheduler - Fetch appointments (Entity Framework)
+
+This example handles the [FetchAppointments](https://docs.devexpress.com/CoreLibraries/DevExpress.XtraScheduler.SchedulerStorageBase.FetchAppointments) event to load specific appointments. This can be useful when the Scheduler control is bound to a large set of data and you only need to load a small portion of it at a time.
+
+```csharp
+private void Storage_FetchAppointments(object sender, FetchAppointmentsEventArgs e) {
+    DateTime startTime = e.Interval.Start;
+    DateTime endTime = e.Interval.End;
+
+    var entities = carsXtraSchedulingEntities.CarSchedulings.Where(entity => (entity.EventType == 1) ||
+        (entity.EventType != 1 &&
+        (entity.OriginalStartTime >= startTime && entity.OriginalStartTime < endTime) || (entity.OriginalEndTime > startTime && entity.OriginalEndTime <= endTime)));
+    
+    entities.Load();
+    var collection =  carsXtraSchedulingEntities.CarSchedulings.Local.ToBindingList();
+    schedulerControl1.Storage.Appointments.DataSource =collection;
+    Text = String.Format("{0} appointments are loaded for {1} interval", collection.Count, e.Interval);
+}
+```
+
+> **Note**
+>
+> The example uses the "Database First" Entity Framework approach. To test the project locally, set up the **CarsXtraScheduling** sample database in your SQL Server instance. The database script is included along with the attached solution.
+
+
+### Recurring Appointments
+
+A recurring appointment series is never stored in the data source. The data source only contains records for pattern and changed/deleted appointments. Once you change or delete an appointment from that series, a new appointment is created with the corresponding [Appointment.Type](https://docs.devexpress.com/CoreLibraries/DevExpress.XtraScheduler.Appointment.Type) (`AppointmentType.ChangedOccurrence` or `AppointmentType.DeletedOccurrence`). This appointment is stored in the data source as a separate record.
+
+The Scheduler Control generates recurring series with occurrences based on a recurring rule of the pattern. The Scheduler Control removes deleted and changed occurrences from the chain. If the changed occurrence is moved outside of the queryable time range, the occurrence is not loaded and the Scheduler Control <strong>generates an occurrence with the corresponding recurrence index</strong> instead of the changed occurrence (which is not loaded).
+
+This example shows how to load all changed occurrences despite their `Start` and `End` property values or implement two [appointment custom fields](https://docs.devexpress.com/WindowsForms/17137/controls-and-libraries/scheduler/data-binding/mappings/custom-fields) to store original occurrence's `Start` and `End` values.
+
+Prior to v.15.2, the `FetchAppointments` event occurs in situations, which do not involve any changes in displayed data ranges. This behavior may result in unhandled exceptions if the event was not properly handled. We have implemented additional internal criteria that should be met before the event is raised. In v.15.2+, the `FetchAppointments` event fires not as often as it did before and does not fire at all in certain cases. If you experience unwanted side effects due to the newly introduced behavior, disable the [EnableSmartFetch<](https://docs.devexpress.com/CoreLibraries/DevExpress.XtraScheduler.SchedulerStorageBase.EnableSmartFetch) option to revert to the former mechanism of raising the `FetchAppointments` event.
+
+
+## Files to Review
+
 * [Form1.cs](./CS/Form1.cs) (VB: [Form1.vb](./VB/Form1.vb))
-* [Model1.Context.cs](./CS/Model1.Context.cs) (VB: [Model1.Context.vb](./VB/Model1.Context.vb))
-* [Model1.cs](./CS/Model1.cs) (VB: [Model1.vb](./VB/Model1.vb))
-* [Program.cs](./CS/Program.cs) (VB: [Program.vb](./VB/Program.vb))
-<!-- default file list end -->
-# How to handle the FetchAppointments event when the scheduler is used with Entity Framework
 
 
-<p>The <a href="http://documentation.devexpress.com/#CoreLibraries/DevExpressXtraSchedulerSchedulerStorageBase_FetchAppointmentstopic">SchedulerStorageBase.FetchAppointments Event</a> allows you to limit the number of appointments fetched from the data source. This can be useful when working with a large amount of data, and only a small part of it needs to be loaded at one time. </p>
-<p><br>Please pay special attention to managing recurring appointments. A recurring appointment series is never stored in the underlying data source. The data source only contains records for the pattern, and changed and deleted appointments. Once you change or delete any appointment from that series, a new appointment is created with a corresponding <a href="https://documentation.devexpress.com/CoreLibraries/DevExpressXtraSchedulerAppointment_Typetopic.aspx">Appointment.Type</a> - <a href="https://documentation.devexpress.com/CoreLibraries/DevExpressXtraSchedulerAppointmentTypeEnumtopic.aspx">AppointmentType.ChangedOccurrence</a> (value = 3) or <a href="https://documentation.devexpress.com/CoreLibraries/DevExpressXtraSchedulerAppointmentTypeEnumtopic.aspx">AppointmentType.DeletedOccurrence</a> (value = 4 ), and this appointment is stored in the data source as a separate record. <br><br>The SchedulerControl generates recurring series with occurrences based on the pattern's recurring rule and removes deleted and changed occurrences from the chain. However, if the changed occurrence is moved outside of the queryable time range, it is not loaded and the SchedulerControl will <strong>generate an occurrence with the corresponding recurrence index</strong> instead of this (non-loaded) changed occurrence. <br><br>To handle this situation, it is possible to load all changed occurrences despite their Start and End property values or implement two additional <a href="https://documentation.devexpress.com/#WindowsForms/CustomDocument17137">appointment custom fields</a> to store original occurrence's Start and End values. The latter approach is demonstrated in this example.</p>
-<p> </p>
-<p>Please note that prior to v.15.2, the FetchAppointments event occurs in situations, which do not involve any changes in displayed data ranges. This behavior may result in unhandled exceptions if the event was not properly handled. To solve the problem, we have implemented additional internal criteria that should be met before the event is raised. Starting with v.15.2, the FetchAppointments event fires not as often as it did before and does not fire at all in certain situations. If you experience unwanted side effects due to the newly introduced behavior, set the <a href="https://documentation.devexpress.com/CoreLibraries/DevExpressXtraSchedulerSchedulerStorageBase_EnableSmartFetchtopic.aspx">EnableSmartFetch</a> option to <strong>false</strong> to revert to the former mechanism of raising the FetchAppointments event.<br><br>This example uses the "Database First" Entity Framework approach. To test the project locally, set up the CarsXtraScheduling sample database in your SQL Server instance. This database script is included along with the attached solution. </p>
-<p><strong>See Also:</strong></p>
-<p> <a href="http://www.entityframeworktutorial.net/create-first-simple-EDM.aspx">Create the First simple Entity Data Model</a></p>
+## See Also
 
-<br/>
-
-
+* [Creating an Entity Data Model](https://www.entityframeworktutorial.net/entityframework6/create-entity-data-model.aspx)
