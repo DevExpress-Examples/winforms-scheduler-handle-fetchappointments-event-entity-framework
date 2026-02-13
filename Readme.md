@@ -50,7 +50,7 @@ Prior to v.15.2, the `FetchAppointments` event occurs in situations that do not 
 
 * [Creating an Entity Data Model](https://www.entityframeworktutorial.net/entityframework6/create-entity-data-model.aspx)
 <!-- feedback -->
-## Does this example address your development requirements/objectives?
+## Does This Example Address Your Development Requirements/Objectives?
 
 [<img src="https://www.devexpress.com/support/examples/i/yes-button.svg"/>](https://www.devexpress.com/support/examples/survey.xml?utm_source=github&utm_campaign=winforms-scheduler-handle-fetchappointments-event-entity-framework&~~~was_helpful=yes) [<img src="https://www.devexpress.com/support/examples/i/no-button.svg"/>](https://www.devexpress.com/support/examples/survey.xml?utm_source=github&utm_campaign=winforms-scheduler-handle-fetchappointments-event-entity-framework&~~~was_helpful=no)
 
